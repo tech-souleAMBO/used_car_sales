@@ -22,7 +22,7 @@ RUN printf '<VirtualHost *:80>\n\
         AllowOverride All\n\
         Require all granted\n\
     </Directory>\n\
-    CGIPassAuth on\n\
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1\n\
     ErrorLog ${APACHE_LOG_DIR}/error.log\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>\n' > /etc/apache2/sites-available/000-default.conf
