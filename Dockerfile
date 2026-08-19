@@ -10,7 +10,8 @@ FROM php:8.3-apache
 RUN apt-get update && apt-get install -y \
     libpq-dev libzip-dev unzip \
     && docker-php-ext-install pdo pdo_pgsql zip \
-    && a2enmod rewrite
+    && a2enmod rewrite \
+    && a2enmod cgid
 
 WORKDIR /var/www/html
 COPY --from=vendor /app ./
@@ -21,6 +22,7 @@ RUN printf '<VirtualHost *:80>\n\
         AllowOverride All\n\
         Require all granted\n\
     </Directory>\n\
+    CGIPassAuth on\n\
     ErrorLog ${APACHE_LOG_DIR}/error.log\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>\n' > /etc/apache2/sites-available/000-default.conf
