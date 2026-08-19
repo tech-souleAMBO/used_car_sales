@@ -24,11 +24,33 @@ class ContactController extends Controller
             'message' => $data['message'],
         ]);
 
-        // L'envoi d'e-mail ne doit jamais faire échouer la requête
+        $vehicleLabel = '';
+        if (! empty($data['vehicleId'])) {
+            $vehicle = Vehicle::find($data['vehicleId']);
+            if ($vehicle) {
+                $vehicleLabel = "{$vehicle->model} ({$vehicle->year})";
+            }
+        }
+
+        $body = collect([
+            "Nom : {$data['name']}",
+            "E-mail : {$data['email']}",
+            ! empty($data['phone']) ? "Telephone : {$data['phone']}" : null,
+            $vehicleLabel ? "Vehicule concerne : {$vehicleLabel}" : null,
+            '',
+            $data['message'],
+        ])->filter()->implode("\n");
+
+        $subject = 'Nouvelle demande de contact'.($vehicleLabel ? " - {$vehicleLabel}" : '');
+
         try {
-            $this->sendNotificationEmail($data);
+            Mail::raw($body, function ($mail) use ($data, $subject) {
+                $mail->to(config('mail.from.address'))
+                    ->replyTo($data['email'])
+                    ->subject($subject);
+            });
         } catch (\Throwable $e) {
-            Log::warning("Échec de l'envoi de l'e-mail de notification : ".$e->getMessage());
+            Log::warning("Echec envoi email contact: ".$e->getMessage());
         }
 
         return response()->json(['message' => 'Votre message a bien été envoyé', 'id' => $message->id], 201);
@@ -56,37 +78,5 @@ class ContactController extends Controller
         $message->update(['is_read' => true]);
 
         return new ContactMessageResource($message);
-    }
-
-    private function sendNotificationEmail(array $data): void
-    {
-        if (! config('mail.mailers.smtp.host')) {
-            Log::warning('SMTP non configuré : e-mail de contact non envoyé (voir .env)');
-
-            return;
-        }
-
-        $vehicleLabel = '';
-        if (! empty($data['vehicleId'])) {
-            $vehicle = Vehicle::find($data['vehicleId']);
-            if ($vehicle) {
-                $vehicleLabel = "{$vehicle->model} ({$vehicle->year})";
-            }
-        }
-
-        $body = collect([
-            "Nom : {$data['name']}",
-            "E-mail : {$data['email']}",
-            ! empty($data['phone']) ? "Téléphone : {$data['phone']}" : null,
-            $vehicleLabel ? "Véhicule concerné : {$vehicleLabel}" : null,
-            '',
-            $data['message'],
-        ])->filter()->implode("\n");
-
-        Mail::raw($body, function ($mail) use ($data, $vehicleLabel) {
-            $mail->to(config('mail.from.address'))
-                ->replyTo($data['email'])
-                ->subject('Nouvelle demande de contact'.($vehicleLabel ? " - {$vehicleLabel}" : ''));
-        });
     }
 }
