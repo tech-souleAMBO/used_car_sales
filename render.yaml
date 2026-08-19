@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: used-car-sales
+    runtime: node
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BACKEND_INTERNAL_URL
+        sync: false
+        value: https://autolara-backend.onrender.com
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+        value: https://used-car-sales.onrender.com

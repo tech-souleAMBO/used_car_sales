@@ -6,6 +6,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: 'autolara-backend.onrender.com' },
     ],
   },
   async rewrites() {
