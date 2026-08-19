@@ -11,6 +11,9 @@ services:
       - key: BACKEND_INTERNAL_URL
         sync: false
         value: https://autolara-backend.onrender.com
+      - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false
+        value: https://autolara-backend.onrender.com
       - key: NEXT_PUBLIC_SITE_URL
         sync: false
-        value: https://used-car-sales.onrender.com
+        value: https://voiture-occasion.onrender.com

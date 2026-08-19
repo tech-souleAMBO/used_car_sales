@@ -6,12 +6,14 @@ import type {
 } from './types';
 import { getAccessToken, setAccessToken } from './auth';
 
-// Côté client : /api/v1 (passe par le proxy Next.js rewrite → backend).
+// Côté client : on appelle le backend directement (le proxy Next.js ne transmet pas le header Authorization).
 // Côté serveur (Server Components) : variable d'env BACKEND_INTERNAL_URL ou fallback local.
 const BACKEND_BASE = process.env.BACKEND_INTERNAL_URL ?? 'http://127.0.0.1:8000';
+const PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? '';
 
 function getApiUrl(): string {
   if (typeof window === 'undefined') return `${BACKEND_BASE}/api/v1`;
+  if (PUBLIC_BACKEND_URL) return `${PUBLIC_BACKEND_URL}/api/v1`;
   return '/api/v1';
 }
 
