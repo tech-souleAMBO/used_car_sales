@@ -3,6 +3,7 @@ WORKDIR /app
 COPY backend-laravel/composer.json backend-laravel/composer.lock* ./
 RUN composer install --no-dev --no-scripts --no-autoloader --ignore-platform-reqs
 COPY backend-laravel/ ./
+RUN mkdir -p bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache
 RUN composer dump-autoload --optimize
 
 FROM php:8.3-apache
