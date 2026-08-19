@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-body;
+  }
+
+  ::selection {
+    @apply bg-accent/20;
+  }
+
+  /* Focus visible clair et cohérent pour l'accessibilité clavier */
+  :focus-visible {
+    outline: 2px solid theme('colors.accent.DEFAULT');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Chiffres tabulaires façon compteur digital pour prix / kilométrage / année */
+  .tabular-figure {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded px-4 py-2.5 text-sm font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-ink/90;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent text-white hover:bg-accent-dark;
+  }
+
+  .btn-outline {
+    @apply btn border border-line bg-transparent text-ink hover:border-ink;
+  }
+
+  .input {
+    @apply w-full rounded border border-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink/40 focus:border-ink;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-ink/60;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
