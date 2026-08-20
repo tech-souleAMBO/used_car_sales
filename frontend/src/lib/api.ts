@@ -207,7 +207,7 @@ export const api = {
       return result;
     },
     forgotPassword: (email: string) =>
-      request<{ message: string }>('/auth/forgot-password', {
+      request<{ message: string; resetUrl: string }>('/auth/forgot-password', {
         method: 'POST',
         body: JSON.stringify({ email }),
       }),
