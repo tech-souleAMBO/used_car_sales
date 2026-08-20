@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, KeyRound } from 'lucide-react';
 import { api } from '@/lib/api';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
@@ -99,5 +99,13 @@ export default function ResetPasswordPage() {
         Retour à la connexion
       </Link>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-ink/50">Chargement...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
