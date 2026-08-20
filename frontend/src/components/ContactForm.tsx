@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Mail } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -10,6 +10,7 @@ export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; ve
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -18,20 +19,35 @@ export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; ve
     try {
       await api.contact.send({ vehicleId, ...form });
 
-      fetch(FORMSUBMIT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone || 'Non renseigne',
-          vehicle: vehicleLabel || 'General',
-          message: form.message,
-          _subject: `Nouvelle demande de contact - ${vehicleLabel || 'General'}`,
-          _captcha: 'false',
-          _template: 'table',
-        }),
-      }).catch(() => {});
+      const hiddenForm = document.createElement('form');
+      hiddenForm.action = FORMSUBMIT_URL;
+      hiddenForm.method = 'POST';
+      hiddenForm.target = 'formsubmit_frame';
+      hiddenForm.style.display = 'none';
+
+      const fields: Record<string, string> = {
+        name: form.name,
+        email: form.email,
+        phone: form.phone || 'Non renseigne',
+        vehicle: vehicleLabel || 'General',
+        message: form.message,
+        _subject: `Nouvelle demande de contact - ${vehicleLabel || 'General'}`,
+        _captcha: 'false',
+        _template: 'table',
+        _next: window.location.href,
+      };
+
+      Object.entries(fields).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        hiddenForm.appendChild(input);
+      });
+
+      document.body.appendChild(hiddenForm);
+      hiddenForm.submit();
+      document.body.removeChild(hiddenForm);
 
       setStatus('success');
       setForm({ name: '', email: '', phone: '', message: '' });
@@ -51,6 +67,7 @@ export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; ve
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
+      <iframe ref={iframeRef} name="formsubmit_frame" style={{ display: 'none' }} />
       <div>
         <label className="label" htmlFor="name">
           Nom
