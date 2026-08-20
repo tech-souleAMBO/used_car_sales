@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const FORMSUBMIT_URL = 'https://formsubmit.co/mavoituredoccasion.fr@gmail.com';
 
@@ -15,7 +16,9 @@ export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; ve
     setStatus('loading');
     setErrorMessage('');
     try {
-      const response = await fetch(FORMSUBMIT_URL, {
+      await api.contact.send({ vehicleId, ...form });
+
+      fetch(FORMSUBMIT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -28,9 +31,7 @@ export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; ve
           _captcha: 'false',
           _template: 'table',
         }),
-      });
-
-      if (!response.ok) throw new Error('Erreur lors de l\'envoi');
+      }).catch(() => {});
 
       setStatus('success');
       setForm({ name: '', email: '', phone: '', message: '' });

@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreContactMessageRequest;
 use App\Http\Resources\ContactMessageResource;
 use App\Models\ContactMessage;
-use App\Models\Vehicle;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
@@ -24,34 +22,7 @@ class ContactController extends Controller
             'message' => $data['message'],
         ]);
 
-        $vehicleLabel = '';
-        if (! empty($data['vehicleId'])) {
-            $vehicle = Vehicle::find($data['vehicleId']);
-            if ($vehicle) {
-                $vehicleLabel = "{$vehicle->model} ({$vehicle->year})";
-            }
-        }
-
-        $body = collect([
-            "Nom : {$data['name']}",
-            "E-mail : {$data['email']}",
-            ! empty($data['phone']) ? "Telephone : {$data['phone']}" : null,
-            $vehicleLabel ? "Vehicule concerne : {$vehicleLabel}" : null,
-            '',
-            $data['message'],
-        ])->filter()->implode("\n");
-
-        $subject = 'Nouvelle demande de contact'.($vehicleLabel ? " - {$vehicleLabel}" : '');
-
-        try {
-            Mail::raw($body, function ($mail) use ($data, $subject) {
-                $mail->to(config('mail.from.address'))
-                    ->replyTo($data['email'])
-                    ->subject($subject);
-            });
-        } catch (\Throwable $e) {
-            Log::warning("Echec envoi email contact: ".$e->getMessage());
-        }
+        Log::info('Message de contact sauvegardé', ['id' => $message->id, 'email' => $data['email']]);
 
         return response()->json(['message' => 'Votre message a bien été envoyé', 'id' => $message->id], 201);
     }
