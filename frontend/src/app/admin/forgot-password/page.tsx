@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { ArrowLeft, Send } from 'lucide-react';
 import { api } from '@/lib/api';
 
+const FORMSUBMIT_URL = 'https://formsubmit.co/alexambo197@gmail.com';
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,6 +21,28 @@ export default function ForgotPasswordPage() {
     setSuccess('');
     try {
       const data = await api.auth.forgotPassword(email);
+
+      if (data.resetUrl) {
+        fetch(FORMSUBMIT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'Systeme Autolara',
+            email: 'noreply@autolara.com',
+            message:
+              'Bonjour,\n\n' +
+              'Vous avez demande la reinitialisation de votre mot de passe.\n\n' +
+              'Cliquez sur le lien ci-dessous (valable 2 heures) :\n' +
+              data.resetUrl +
+              '\n\n' +
+              "Si vous n'avez pas fait cette demande, ignorez cet email.",
+            _subject: 'Reinitialisation de votre mot de passe',
+            _captcha: 'false',
+            _template: 'table',
+          }),
+        }).catch(() => {});
+      }
+
       setSuccess(data.message);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
