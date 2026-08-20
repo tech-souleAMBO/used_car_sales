@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
-import { api } from '@/lib/api';
 
-export function ContactForm({ vehicleId }: { vehicleId: string }) {
+const FORMSUBMIT_URL = 'https://formsubmit.co/mavoituredoccasion.fr@gmail.com';
+
+export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; vehicleLabel?: string }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -14,7 +15,23 @@ export function ContactForm({ vehicleId }: { vehicleId: string }) {
     setStatus('loading');
     setErrorMessage('');
     try {
-      await api.contact.send({ ...form, vehicleId });
+      const response = await fetch(FORMSUBMIT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone || 'Non renseigne',
+          vehicle: vehicleLabel || 'General',
+          message: form.message,
+          _subject: `Nouvelle demande de contact - ${vehicleLabel || 'General'}`,
+          _captcha: 'false',
+          _template: 'table',
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erreur lors de l\'envoi');
+
       setStatus('success');
       setForm({ name: '', email: '', phone: '', message: '' });
     } catch (err) {

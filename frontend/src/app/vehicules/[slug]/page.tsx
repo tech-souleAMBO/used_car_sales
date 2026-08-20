@@ -116,7 +116,7 @@ export default async function VehicleDetailPage({ params }: PageProps) {
             <h2 className="mb-3 font-display text-sm font-medium text-ink">
               Contacter le vendeur par e-mail
             </h2>
-            <ContactForm vehicleId={vehicle.id} />
+            <ContactForm vehicleId={vehicle.id} vehicleLabel={`${vehicle.brand.name} ${vehicle.model} ${vehicle.year}`} />
 
             <div className="mt-6 border-t border-line pt-4">
               <p className="mb-2 text-xs uppercase tracking-wide text-ink/50">Partager</p>
