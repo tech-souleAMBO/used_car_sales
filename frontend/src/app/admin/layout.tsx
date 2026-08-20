@@ -22,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const isLoginPage = pathname === '/admin';
+  const isPublicPage = isLoginPage || pathname === '/admin/forgot-password' || pathname.startsWith('/admin/reset-password');
 
   useEffect(() => {
     async function checkSession() {
@@ -32,21 +33,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         await refreshAccessToken();
       }
 
-      if (!isLoginPage && !isAuthenticated()) {
+      if (!isPublicPage && !isAuthenticated()) {
         router.replace('/admin');
         return;
       }
       setChecked(true);
     }
     checkSession();
-  }, [isLoginPage, router]);
+  }, [isPublicPage, router]);
 
   async function handleLogout() {
     await api.auth.logout().catch(() => undefined);
     router.push('/admin');
   }
 
-  if (isLoginPage) {
+  if (isPublicPage) {
     return <>{children}</>;
   }
 
