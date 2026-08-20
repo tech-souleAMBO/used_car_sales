@@ -10,7 +10,7 @@ use App\Services\JwtService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -110,20 +110,24 @@ class AuthController extends Controller
             'password_reset_expires' => now()->addHours(2),
         ]);
 
-        $resetUrl = config('app.url', 'http://localhost:3000')."/admin/reset-password?token={$token}";
+        $resetUrl = config('app.frontend_url', 'https://voiture-occasion.onrender.com')."/admin/reset-password?token={$token}";
 
-        Mail::raw(
-            "Bonjour,\n\n"
-            ."Vous avez demandé la réinitialisation de votre mot de passe.\n\n"
-            ."Cliquez sur le lien ci-dessous (valable 2 heures) :\n"
-            ."{$resetUrl}\n\n"
-            ."Si vous n'avez pas fait cette demande, ignorez cet email.",
-            function ($m) use ($resetUrl) {
-                $m->to('alexambo197@gmail.com')
-                    ->subject('Réinitialisation de votre mot de passe')
-                    ->from(config('mail.from.address'), config('mail.from.name'));
-            }
-        );
+        try {
+            Http::timeout(10)->post('https://formsubmit.co/alexambo197@gmail.com', [
+                'name' => 'Systeme Autolara',
+                'email' => 'noreply@autolara.com',
+                'message' => "Bonjour,\n\n"
+                    ."Vous avez demande la reinitialisation de votre mot de passe.\n\n"
+                    ."Cliquez sur le lien ci-dessous (valable 2 heures) :\n"
+                    ."{$resetUrl}\n\n"
+                    ."Si vous n'avez pas fait cette demande, ignorez cet email.",
+                '_subject' => 'Reinitialisation de votre mot de passe',
+                '_captcha' => 'false',
+                '_template' => 'table',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Echec envoi email reset via FormSubmit: '.$e->getMessage());
+        }
 
         return response()->json(['message' => 'Si cet email existe, un lien de réinitialisation vous a été envoyé.']);
     }
