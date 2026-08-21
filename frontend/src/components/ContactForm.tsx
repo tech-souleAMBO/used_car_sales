@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { Mail } from 'lucide-react';
 import { api } from '@/lib/api';
 
-const FORMSUBMIT_URL = 'https://formsubmit.co/mavoituredoccasion.fr@gmail.com';
+const FORMSUBMIT_URL = 'https://formsubmit.co/alexambo197@gmail.com';
 
 export function ContactForm({ vehicleId, vehicleLabel }: { vehicleId: string; vehicleLabel?: string }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
