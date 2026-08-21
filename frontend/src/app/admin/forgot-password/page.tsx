@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { ArrowLeft, Send } from 'lucide-react';
 import { api } from '@/lib/api';
 
-const FORMSUBMIT_URL = 'https://formsubmit.co/alexambo197@gmail.com';
+const WEB3FORMS_KEY = '145e25ab-b8ce-49e0-a221-b4c3f720de19';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -23,39 +23,24 @@ export default function ForgotPasswordPage() {
       const data = await api.auth.forgotPassword(email);
 
       if (data.resetUrl) {
-        const hiddenForm = document.createElement('form');
-        hiddenForm.action = FORMSUBMIT_URL;
-        hiddenForm.method = 'POST';
-        hiddenForm.target = 'formsubmit_frame';
-        hiddenForm.style.display = 'none';
-
-        const fields: Record<string, string> = {
-          name: 'Systeme Autolara',
-          email: 'noreply@autolara.com',
-          message:
-            'Bonjour,\n\n' +
-            'Vous avez demande la reinitialisation de votre mot de passe.\n\n' +
-            'Cliquez sur le lien ci-dessous (valable 2 heures) :\n' +
-            data.resetUrl +
-            '\n\n' +
-            "Si vous n'avez pas fait cette demande, ignorez cet email.",
-          _subject: 'Reinitialisation de votre mot de passe',
-          _captcha: 'false',
-          _template: 'table',
-          _next: window.location.href,
-        };
-
-        Object.entries(fields).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value;
-          hiddenForm.appendChild(input);
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            name: 'Systeme Autolara',
+            email: 'noreply@autolara.com',
+            message:
+              'Bonjour,\n\n' +
+              'Vous avez demande la reinitialisation de votre mot de passe.\n\n' +
+              'Cliquez sur le lien ci-dessous (valable 2 heures) :\n' +
+              data.resetUrl +
+              '\n\n' +
+              "Si vous n'avez pas fait cette demande, ignorez cet email.",
+            subject: 'Reinitialisation de votre mot de passe',
+            from_name: 'Autolara',
+          }),
         });
-
-        document.body.appendChild(hiddenForm);
-        hiddenForm.submit();
-        document.body.removeChild(hiddenForm);
       }
 
       setSuccess(data.message);
@@ -75,7 +60,6 @@ export default function ForgotPasswordPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <iframe name="formsubmit_frame" style={{ display: 'none' }} />
         <div>
           <label className="label" htmlFor="email">E-mail</label>
           <input
