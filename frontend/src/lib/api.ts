@@ -44,6 +44,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     ...rest,
     headers: finalHeaders,
     credentials: 'include',
+    cache: 'no-store',
   });
 
   // Tentative de rafraîchissement automatique du token en cas de 401 sur une route admin
