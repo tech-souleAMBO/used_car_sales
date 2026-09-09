@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="border-t border-line bg-ink text-paper/70">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-paper p-1.5">
@@ -40,6 +40,19 @@ export function Footer() {
               <li>
                 <Link href="/favoris" className="hover:text-paper">
                   Favoris
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-paper/50">
+              Espace Admin
+            </p>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/admin/login" className="hover:text-paper">
+                  Connexion administrateur
                 </Link>
               </li>
             </ul>
