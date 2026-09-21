@@ -1,0 +1,11 @@
+.git
+.vscode
+frontend
+*.dump
+*.log
+render.yaml
+README.md
+backend-laravel/.env
+backend-laravel/.env.example
+backend-laravel/vendor
+backend-laravel/storage/logs/*
