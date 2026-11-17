@@ -32,6 +32,19 @@ class HealthController extends Controller
             } catch (\Throwable $e) {
                 $payload['database'] = 'down';
                 $payload['status'] = 'degraded';
+                // Diagnostic temporaire : permet de lire l'erreur exacte de
+                // connexion sans avoir accès aux logs Render. A retirer (ou
+                // à gate derriere config('app.debug')) une fois la base
+                // rétablie.
+                $payload['database_error'] = mb_substr($e->getMessage(), 0, 400);
+                $connection = DB::connection();
+                $payload['database_target'] = sprintf(
+                    '%s@%s:%s/%s',
+                    $connection->getConfig('username'),
+                    $connection->getConfig('host'),
+                    $connection->getConfig('port'),
+                    $connection->getConfig('database'),
+                );
             }
         }
 
