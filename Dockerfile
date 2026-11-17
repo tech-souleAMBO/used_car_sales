@@ -30,4 +30,4 @@ RUN printf '<VirtualHost *:80>\n\
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80
-CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --force && apache2-foreground"]
+CMD ["sh", "-c", "for i in 1 2 3; do if php artisan migrate --force && php artisan db:seed --force; then echo '[boot] migrations OK'; break; fi; echo \"[boot] migrate/seed FAILED (attempt $i/3) - retrying in 10s\"; sleep 10; done; echo '[boot] starting Apache (migrate failures are logged above but no longer block the service)'; apache2-foreground"]

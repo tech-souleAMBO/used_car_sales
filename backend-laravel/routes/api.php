@@ -6,10 +6,14 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\ComparisonController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\VehicleController;
 use Illuminate\Support\Facades\Route;
+
+// ==================== Santé de l'API (health check Render) ====================
+Route::get('/health', HealthController::class);
 
 // ==================== Auth ====================
 Route::post('/auth/login', [AuthController::class, 'login']);

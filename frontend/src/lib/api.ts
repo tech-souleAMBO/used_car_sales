@@ -11,6 +11,10 @@ import { getAccessToken, setAccessToken } from './auth';
 const BACKEND_BASE = process.env.BACKEND_INTERNAL_URL ?? 'http://127.0.0.1:8000';
 const PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? '';
 
+// Timeout des appels API effectués côté serveur (rendu des pages).
+// Sans ça, un backend hors service bloque indéfiniment le rendu de l'accueil.
+const SERVER_TIMEOUT_MS = 8000;
+
 function getApiUrl(): string {
   if (typeof window === 'undefined') return `${BACKEND_BASE}/api/v1`;
   if (PUBLIC_BACKEND_URL) return `${PUBLIC_BACKEND_URL}/api/v1`;
@@ -40,11 +44,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   // `credentials: 'include'` est nécessaire sur TOUTES les requêtes (même publiques) pour que
   // le navigateur envoie/reçoive le cookie httpOnly du refresh token (domaine croisé en dev :
   // frontend sur :3000, API sur :4000).
+  // Côté serveur (Server Components) : on impose un timeout, sinon une API
+  // indisponible fait pendouiller le rendu de la page pendant des minutes.
   const response = await fetch(`${getApiUrl()}${path}`, {
     ...rest,
     headers: finalHeaders,
     credentials: 'include',
     cache: 'no-store',
+    signal:
+      rest.signal ??
+      (typeof window === 'undefined' ? AbortSignal.timeout(SERVER_TIMEOUT_MS) : undefined),
   });
 
   // Tentative de rafraîchissement automatique du token en cas de 401 sur une route admin
